@@ -13,16 +13,20 @@ namespace Beskar
     {
         [FunctionName("Ping")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req,
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
             await Task.Yield();
 
-            string responseMessage = "Pong";
+            return (ActionResult)new OkObjectResult(new
+            {
+                returnMessage = "Beskar Functions Ping Response",
+                returnStatusCode = 0,
+                returnDate = DateTimeOffset.UtcNow
+            });
 
-            return new OkObjectResult(responseMessage);
         }
     }
 }
