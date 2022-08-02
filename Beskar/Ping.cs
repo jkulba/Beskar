@@ -22,7 +22,8 @@ namespace Beskar
 
             return (ActionResult)new OkObjectResult(new
             {
-                returnMessage = "Beskar Functions Ping Response",
+                returnMessage = "Ping Function Response",
+                functionName = "PING",
                 returnStatusCode = 0,
                 returnDate = DateTimeOffset.UtcNow
             });
