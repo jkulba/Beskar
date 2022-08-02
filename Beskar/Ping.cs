@@ -11,12 +11,19 @@ namespace Beskar
 {
     public static class Ping
     {
+        private static string _invocationId;
+
         [FunctionName("Ping")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req,
-            ILogger log)
+            ExecutionContext executionContext, ILogger log)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+
+            _invocationId = executionContext.InvocationId.ToString();
+
+            log.LogInformation("PING function service endpoint received a request.");
+
+            log.LogInformation(Environment.GetEnvironmentVariable("AzureWebJobsStorage", EnvironmentVariableTarget.Process));
 
             await Task.Yield();
 
@@ -24,6 +31,7 @@ namespace Beskar
             {
                 returnMessage = "Ping Function Response",
                 functionName = "PING",
+                invocationId = _invocationId,
                 returnStatusCode = 0,
                 returnDate = DateTimeOffset.UtcNow
             });
