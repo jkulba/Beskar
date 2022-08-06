@@ -1,19 +1,23 @@
 variable "project" {
   type        = string
-  description = "beskar"
+  description = "Project Name"
+  default     = "beskar"
 }
 
 variable "environment" {
   type        = string
-  description = "dev"
+  description = "Environment"
+  default     = "dev"
 }
 
 variable "location" {
   type        = string
-  description = "westus"
+  description = "Azure Region"
+  default     = "westus"
 }
 
 variable "team" {
   type        = string
-  description = "ProFile"
+  description = "Engineering Team"
+  default     = "DevOps"
 }
