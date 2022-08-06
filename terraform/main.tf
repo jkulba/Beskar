@@ -28,7 +28,7 @@ resource "azurerm_resource_group" "resource_group" {
 resource "azurerm_storage_account" "storage_account" {
   name                     = "${var.project}${var.environment}storageaccount"
   resource_group_name      = azurerm_resource_group.resource_group.name
-  location                 = var.location
+  location                 = azurerm_resource_group.resource_group.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
 
@@ -39,44 +39,73 @@ resource "azurerm_storage_account" "storage_account" {
   }
 }
 
-resource "azurerm_storage_container" "blob_storage_container" {
-  name                  = "${var.project}${var.environment}blobstorage"
-  storage_account_name  = azurerm_storage_account.storage_account.name
-  container_access_type = "private"
-}
+# resource "azurerm_storage_container" "storage_container" {
+#   name                  = "${var.project}${var.environment}storage"
+#   storage_account_name  = azurerm_storage_account.storage_account.name
+#   container_access_type = "private"
 
-resource "azurerm_storage_queue" "queue_storage" {
-  name                 = "${var.project}${var.environment}queue"
-  storage_account_name = azurerm_storage_account.storage_account.name
-}
+#   tags = {
+#     Application = var.project
+#     Env         = var.environment
+#     Team        = var.team
+#   }
+# }
+
+# resource "azurerm_storage_queue" "queue_storage" {
+#   name                 = "${var.project}${var.environment}queue"
+#   storage_account_name = azurerm_storage_account.storage_account.name
+# }
 
 resource "azurerm_application_insights" "application_insights" {
   name                = "${var.project}${var.environment}appinsights"
-  location            = var.location
+  location            = azurerm_resource_group.resource_group.location
   resource_group_name = azurerm_resource_group.resource_group.name
   application_type    = "web"
+
+  tags = {
+    Application = var.project
+    Env         = var.environment
+    Team        = var.team
+    Monitoring  = "FunctionApp"
+  }
 }
 
 # Create the Linux App Service Plan
 resource "azurerm_service_plan" "service_plan" {
   name                = "${var.project}${var.environment}serviceplan"
   resource_group_name = azurerm_resource_group.resource_group.name
-  location            = var.location
+  location            = azurerm_resource_group.resource_group.location
   os_type             = "Linux"
-  sku_name            = "P1v2"
+  sku_name            = "Y1"
 }
 
-# Create the web app, pass in the App Service Plan ID
-resource "azurerm_linux_web_app" "function_app" {
-  name                = "${var.project}${var.environment}functionapp"
-  location            = var.location
-  resource_group_name = azurerm_resource_group.resource_group.name
-  service_plan_id     = azurerm_service_plan.service_plan.id
-  https_only          = true
+# Create Linux Functiona App
+resource "azurerm_linux_function_app" "example" {
+  name                 = "${var.project}${var.environment}functionapp"
+  resource_group_name  = azurerm_resource_group.resource_group.name
+  location             = azurerm_resource_group.resource_group.location
+  storage_account_name = azurerm_storage_account.storage_account.name
+  service_plan_id      = azurerm_service_plan.service_plan.id
+  https_only           = true
+  app_settings = {
+    "WEBSITE_RUN_FROM_PACKAGE"       = 1
+    "FUNCTIONS_WORKER_RUNTIME"       = "dotnet"
+    "APPINSIGHTS_INSTRUMENTATIONKEY" = "${azurerm_application_insights.application_insights.instrumentation_key}"
+    # "APPLICATIONINSIGHTS_CONNECTION_STRING" = "InstumentationKey="
+  }
+
   site_config {
     minimum_tls_version = "1.2"
   }
 }
+
+
+# resource "azurerm_linux_web_app_slot" "function_app_slot" {
+#   name           = "${var.project}${var.environment}slot"
+#   app_service_id = azurerm_linux_web_app.function_app.id
+
+#   site_config {}
+# }
 
 
 
