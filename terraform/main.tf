@@ -14,7 +14,6 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "resource_group" {
-  # name     = "dev-beskar-rg"
   name     = "${var.project}${var.environment}resourcegroup"
   location = var.location
 
@@ -39,23 +38,12 @@ resource "azurerm_storage_account" "storage_account" {
   }
 }
 
-# resource "azurerm_storage_container" "storage_container" {
-#   name                  = "${var.project}${var.environment}storage"
-#   storage_account_name  = azurerm_storage_account.storage_account.name
-#   container_access_type = "private"
-
-#   tags = {
-#     Application = var.project
-#     Env         = var.environment
-#     Team        = var.team
-#   }
-# }
-
 # resource "azurerm_storage_queue" "queue_storage" {
 #   name                 = "${var.project}${var.environment}queue"
 #   storage_account_name = azurerm_storage_account.storage_account.name
 # }
 
+# Create Application Insights Monitoring
 resource "azurerm_application_insights" "application_insights" {
   name                = "${var.project}${var.environment}appinsights"
   location            = azurerm_resource_group.resource_group.location
@@ -66,7 +54,7 @@ resource "azurerm_application_insights" "application_insights" {
     Application = var.project
     Env         = var.environment
     Team        = var.team
-    Monitoring  = "FunctionApp"
+    Monitoring  = "BeskarFunctionApp"
   }
 }
 
@@ -79,8 +67,8 @@ resource "azurerm_service_plan" "service_plan" {
   sku_name            = "Y1"
 }
 
-# Create Linux Functiona App
-resource "azurerm_linux_function_app" "example" {
+# Create Linux Function App
+resource "azurerm_linux_function_app" "function_app" {
   name                 = "${var.project}${var.environment}functionapp"
   resource_group_name  = azurerm_resource_group.resource_group.name
   location             = azurerm_resource_group.resource_group.location
@@ -106,20 +94,3 @@ resource "azurerm_linux_function_app" "example" {
 
 #   site_config {}
 # }
-
-
-
-
-# resource "azurerm_function_app" "apis" {
-#   name                      = "${var.project}func"
-#   location                  = var.location
-#   resource_group_name       = azurerm_resource_group.resource_group.name
-#   app_service_plan_id       = azurerm_app_service_plan.app_service_plan.id
-#   storage_connection_string = azurerm_storage_account.az_backend.primary_connection_string
-#   https_only                = true
-#   version                   = "~2"
-
-#   app_settings = {
-#     APPINSIGHTS_INSTRUMENTATIONKEY = "${azurerm_application_insights.ai.instrumentation_key}"
-#   }
-
