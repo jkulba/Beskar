@@ -395,3 +395,4 @@ terraform.rc
 
 # End of https://www.toptal.com/developers/gitignore/api/terraform
 terraform/.terraform.lock.hcl
+terraform/main.tfplan
