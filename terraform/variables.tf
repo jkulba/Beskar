@@ -12,3 +12,8 @@ variable "location" {
   type        = string
   description = "westus"
 }
+
+variable "team" {
+  type        = string
+  description = "ProFile"
+}
